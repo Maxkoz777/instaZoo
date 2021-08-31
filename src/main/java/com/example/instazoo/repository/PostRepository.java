@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
+    // it will generate query:
+    // select * from Post where user=<provided user> order by createdTime desc
     List<Post> findAllByUserOrderByCreatedDateDesc(User user);
 
     List<Post> findAllByOrderByCreatedDateDesc();
