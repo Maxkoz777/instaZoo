@@ -4,6 +4,7 @@ import org.springframework.format.number.PercentStyleFormatter;
 
 public class SecurityConstants {
 
+    // url for authorization
     public static final String SIGN_UP_URLS = "/api/auth/**";
 
     public static final String SECRET = "SecretKeyJWT";
