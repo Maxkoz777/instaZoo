@@ -20,18 +20,19 @@ public class JWTTokenProvider {
         Date expireDate = new Date(now.getTime() + SecurityConstants.EXPIRATION_TIME);
 
         String userId = Long.toString(user.getId());
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("id", userId);
-        claims.put("username", user.getUsername());
-        claims.put("firstname", user.getName());
-        claims.put("lastname", user.getLastName());
+
+        Map<String, Object> claimsMap = new HashMap<>();
+        claimsMap.put("id", userId);
+        claimsMap.put("username", user.getEmail());
+        claimsMap.put("firstname", user.getName());
+        claimsMap.put("lastname", user.getLastname());
 
         return Jwts.builder()
                 .setSubject(userId)
-                .addClaims(claims)
+                .addClaims(claimsMap)
                 .setIssuedAt(now)
                 .setExpiration(expireDate)
-                .signWith(SignatureAlgorithm.ES512, SecurityConstants.SECRET)
+                .signWith(SignatureAlgorithm.HS512, SecurityConstants.SECRET)
                 .compact();
     }
 

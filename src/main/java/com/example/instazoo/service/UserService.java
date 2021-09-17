@@ -27,7 +27,7 @@ public class UserService {
         User user = new User();
         user.setEmail(signupRequest.getEmail());
         user.setName(signupRequest.getFirstname());
-        user.setLastName(signupRequest.getLastname());
+        user.setLastname(signupRequest.getLastname());
         user.setUsername(signupRequest.getUsername());
         user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
         user.getRoles().add(ERole.ROLE_USER);

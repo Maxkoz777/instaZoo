@@ -1,5 +1,6 @@
 package com.example.instazoo.payload.request;
 
+import com.example.instazoo.annotations.PasswordMatches;
 import com.example.instazoo.annotations.ValidEmail;
 import lombok.Data;
 
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @Data
+@PasswordMatches
 public class SignupRequest {
 
     @Email(message = "Should be in email format")
