@@ -39,12 +39,13 @@ public class ImageUploadService {
         this.postRepository = postRepository;
     }
 
-    public ImageModel uploadImageToUser(MultipartFile file, Principal principal) throws IOException{
+    public ImageModel uploadImageToUser(MultipartFile file, Principal principal) throws IOException {
         User user = getUserByPrincipal(principal);
-        log.info("Uploading image profile to user {}", user.getUsername());
-        ImageModel image = imageRepository.findByUserId(user.getId()).orElse(null);
-        if (!ObjectUtils.isEmpty(image)) {
-            imageRepository.delete(image);
+        log.info("Uploading image profile to User {}", user.getUsername());
+
+        ImageModel userProfileImage = imageRepository.findByUserId(user.getId()).orElse(null);
+        if (!ObjectUtils.isEmpty(userProfileImage)) {
+            imageRepository.delete(userProfileImage);
         }
         ImageModel imageModel = new ImageModel();
         imageModel.setUserId(user.getId());
@@ -61,16 +62,17 @@ public class ImageUploadService {
                 .collect(toSinglePostCollector());
         ImageModel imageModel = new ImageModel();
         imageModel.setPostId(post.getId());
+        imageModel.setImageBytes(file.getBytes());
         imageModel.setImageBytes(compressBytes(file.getBytes()));
         imageModel.setName(file.getOriginalFilename());
-        log.info("Uploading image to post {}", post.getId());
+        log.info("Uploading image to Post {}", post.getId());
         return imageRepository.save(imageModel);
     }
 
     public ImageModel getImageToUser(Principal principal) {
         User user = getUserByPrincipal(principal);
         ImageModel imageModel = imageRepository.findByUserId(user.getId()).orElse(null);
-        if (ObjectUtils.isEmpty(imageModel)) {
+        if (!ObjectUtils.isEmpty(imageModel)) {
             imageModel.setImageBytes(decompressBytes(imageModel.getImageBytes()));
         }
         return imageModel;
@@ -78,8 +80,8 @@ public class ImageUploadService {
 
     public ImageModel getImageToPost(Long postId) {
         ImageModel imageModel = imageRepository.findByPostId(postId)
-                .orElseThrow(() -> new ImageNotFoundException("Unable to find image to post: " + postId));
-        if (ObjectUtils.isEmpty(imageModel)) {
+                .orElseThrow(() -> new ImageNotFoundException("Cannot find image to Post: " + postId));
+        if (!ObjectUtils.isEmpty(imageModel)) {
             imageModel.setImageBytes(decompressBytes(imageModel.getImageBytes()));
         }
         return imageModel;
@@ -91,17 +93,16 @@ public class ImageUploadService {
         deflater.finish();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(data.length);
         byte[] buffer = new byte[1024];
-        while(!deflater.finished()) {
+        while (!deflater.finished()) {
             int count = deflater.deflate(buffer);
             outputStream.write(buffer, 0, count);
         }
         try {
             outputStream.close();
+        } catch (IOException e) {
+            log.error("Cannot compress Bytes");
         }
-        catch (IOException e) {
-            log.error("Can't compress bytes");
-        }
-        log.info("Compressed bytes size - {}", outputStream.toByteArray().length);
+        System.out.println("Compressed Image Byte Size - " + outputStream.toByteArray().length);
         return outputStream.toByteArray();
     }
 
@@ -116,9 +117,8 @@ public class ImageUploadService {
                 outputStream.write(buffer, 0, count);
             }
             outputStream.close();
-        }
-        catch (IOException | DataFormatException e) {
-            log.error("Cannot compress bytes");
+        } catch (IOException | DataFormatException e) {
+            log.error("Cannot decompress Bytes");
         }
         return outputStream.toByteArray();
     }
@@ -131,14 +131,14 @@ public class ImageUploadService {
 
     private <T> Collector<T, ?, T> toSinglePostCollector() {
         return Collectors.collectingAndThen(
-                    Collectors.toList(),
-                    list -> {
-                        if (list.size() != 1) {
-                            throw new IllegalStateException();
-                        }
-                        return list.get(0);
+                Collectors.toList(),
+                list -> {
+                    if (list.size() != 1) {
+                        throw new IllegalStateException();
                     }
-                    );
+                    return list.get(0);
+                }
+        );
     }
 
 }

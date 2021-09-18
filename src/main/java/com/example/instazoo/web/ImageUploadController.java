@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.security.Principal;
 
 @RestController
-@RequestMapping
+@RequestMapping("/api/image")
 public class ImageUploadController {
 
     private ImageUploadService imageUploadService;
@@ -25,30 +25,30 @@ public class ImageUploadController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<MessageResponse> uploadImageToUser(@RequestParam("file")MultipartFile file,
+    public ResponseEntity<MessageResponse> uploadImageToUser(@RequestParam("file") MultipartFile file,
                                                              Principal principal) throws IOException {
         imageUploadService.uploadImageToUser(file, principal);
-        return ResponseEntity.ok(new MessageResponse("Image uploaded successfully"));
+        return ResponseEntity.ok(new MessageResponse("Image Uploaded Successfully"));
     }
 
     @PostMapping("/{postId}/upload")
     public ResponseEntity<MessageResponse> uploadImageToPost(@PathVariable("postId") String postId,
-                                                     @RequestParam("file") MultipartFile file,
-                                                     Principal principal) throws IOException {
-        imageUploadService.uploadImageToPost(file, principal, Long.valueOf(postId));
-        return ResponseEntity.ok(new MessageResponse("Image uploaded successfully"));
+                                                             @RequestParam("file") MultipartFile file,
+                                                             Principal principal) throws IOException {
+        imageUploadService.uploadImageToPost(file, principal, Long.parseLong(postId));
+        return ResponseEntity.ok(new MessageResponse("Image Uploaded Successfully"));
     }
 
     @GetMapping("/profileImage")
     public ResponseEntity<ImageModel> getImageForUser(Principal principal) {
-        ImageModel imageModel = imageUploadService.getImageToUser(principal);
-        return new ResponseEntity<>(imageModel, HttpStatus.OK);
+        ImageModel userImage = imageUploadService.getImageToUser(principal);
+        return new ResponseEntity<>(userImage, HttpStatus.OK);
     }
 
     @GetMapping("/{postId}/image")
-    public ResponseEntity<ImageModel> getImageForUser(@PathVariable("postId") String postId) {
-        ImageModel imageModel = imageUploadService.getImageToPost(Long.valueOf(postId));
-        return new ResponseEntity<>(imageModel, HttpStatus.OK);
+    public ResponseEntity<ImageModel> getImageToPost(@PathVariable("postId") String postId) {
+        ImageModel postImage = imageUploadService.getImageToPost(Long.parseLong(postId));
+        return new ResponseEntity<>(postImage, HttpStatus.OK);
     }
 
 
