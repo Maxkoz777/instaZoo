@@ -17,7 +17,7 @@ public class Comment {
     private Post post;
 
     @Column(nullable = false)
-    private String userName;
+    private String username;
 
     @Column(nullable = false)
     private Long userId;
