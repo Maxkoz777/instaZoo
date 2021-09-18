@@ -55,7 +55,7 @@ public class PostService {
                 .orElseThrow(() -> new PostNotFoundException("Post wasn't found for for username: " + user.getEmail()));
     }
 
-    public List<Post> getAlPostsForUser(Principal principal) {
+    public List<Post> getAllPostsForUser(Principal principal) {
         User user = getUserByPrincipal(principal);
         return postRepository.findAllByUserOrderByCreatedDateDesc(user);
     }
